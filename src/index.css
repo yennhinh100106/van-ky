@@ -1,0 +1,97 @@
+@import "tailwindcss";
+
+/* Import Vietnamese subsets from @fontsource */
+@import "@fontsource/be-vietnam-pro/vietnamese.css";
+@import "@fontsource/be-vietnam-pro/vietnamese-italic.css";
+@import "@fontsource/be-vietnam-pro/vietnamese-600.css";
+@import "@fontsource/be-vietnam-pro/vietnamese-700.css";
+
+@import "@fontsource/noto-serif/vietnamese.css";
+@import "@fontsource/noto-serif/vietnamese-italic.css";
+@import "@fontsource/noto-serif/vietnamese-600.css";
+@import "@fontsource/noto-serif/vietnamese-700.css";
+@import "@fontsource/noto-serif/vietnamese-700-italic.css";
+@import "@fontsource/noto-serif/vietnamese-900.css";
+@import "@fontsource/noto-serif/vietnamese-900-italic.css";
+
+@import "@fontsource/playfair-display/vietnamese.css";
+@import "@fontsource/playfair-display/vietnamese-italic.css";
+@import "@fontsource/playfair-display/vietnamese-600.css";
+@import "@fontsource/playfair-display/vietnamese-700.css";
+@import "@fontsource/playfair-display/vietnamese-700-italic.css";
+@import "@fontsource/playfair-display/vietnamese-900.css";
+@import "@fontsource/playfair-display/vietnamese-900-italic.css";
+
+@import "@fontsource/cormorant-garamond/vietnamese.css";
+@import "@fontsource/cormorant-garamond/vietnamese-italic.css";
+@import "@fontsource/cormorant-garamond/vietnamese-600.css";
+@import "@fontsource/cormorant-garamond/vietnamese-700.css";
+
+@theme {
+  --font-serif: "Cormorant Garamond", "Noto Serif", "Times New Roman", serif;
+  --font-sans: "Be Vietnam Pro", "Noto Sans", Arial, sans-serif;
+  --font-display: "Noto Serif", "Playfair Display", "Times New Roman", serif;
+}
+
+@layer base {
+  :root {
+    --color-do: #F6EFE3;
+    --color-son: #A4161A;
+    --color-dong: #B8862B;
+    --color-cham: #1F2A44;
+    --color-than: #1A1A1A;
+  }
+
+  html {
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-variant-ligatures: none;
+  }
+
+  body {
+    background-color: #F6EFE3;
+    color: #1A1A1A;
+    font-family: "Be Vietnam Pro", "Noto Sans", Arial, sans-serif;
+    overflow-x: hidden;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-variant-ligatures: none;
+    line-height: 1.6;
+  }
+
+  h1, h2, h3, h4, h5, h6, .font-serif-custom {
+    font-family: "Cormorant Garamond", "Noto Serif", "Times New Roman", serif;
+    line-height: 1.25;
+  }
+
+  .font-display-custom, .font-brand-custom {
+    font-family: "Noto Serif", "Playfair Display", "Times New Roman", serif;
+    line-height: 1.18;
+  }
+}
+
+/* Custom subtle dó paper grain */
+.bg-do-paper {
+  background-color: #F6EFE3;
+  background-image: radial-gradient(#d3c5af 0.75px, transparent 0.75px), radial-gradient(#d3c5af 0.75px, #F6EFE3 0.75px);
+  background-size: 30px 30px;
+  background-position: 0 0, 15px 15px;
+}
+
+/* Custom traditional scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #F6EFE3;
+}
+::-webkit-scrollbar-thumb {
+  background: #C4B299;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #A4161A;
+}

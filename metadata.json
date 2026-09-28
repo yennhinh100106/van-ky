@@ -1,0 +1,6 @@
+{
+  "name": "VẬN KỲ - Phối Việt phục theo cách của bạn",
+  "description": "Nền tảng khám phá, tra cứu lịch sử và phối trang phục truyền thống Việt Nam (Áo Nhật Bình, Áo Tấc, Ngũ Thân, Tứ Thân...) kết hợp AI Stylist và studio thử đồ tương tác.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
