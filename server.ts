@@ -153,10 +153,83 @@ const COLOR_NAMES: Record<string, string> = {
 };
 
 // Helper to generate a cultured, authentic response from Vân when the upstream AI model is experiencing peak demand spikes (503)
-function generateKnowledgeFallback(userQuery: string, context?: any): { text: string; outfitConfig: any } {
+function generateKnowledgeFallback(userQuery: string, context?: any, isEn: boolean = false): { text: string; outfitConfig: any } {
   const query = (userQuery || "").toLowerCase();
 
-  // Pattern match common destinations & occasions
+  if (isEn) {
+    if (query.includes("temple of literature") || query.includes("van mieu") || query.includes("graduation") || query.includes("school")) {
+      return {
+        text: `Hello there! For a visit or graduation shoot at the **Temple of Literature (Văn Miếu - Quốc Tử Giám)** in Hanoi, nothing embodies academic dignity better than **Áo Ngũ Thân tay chẽn (Nguyen Dynasty Five-Panel Robe)** 🌿.
+
+1. **Main Recommendation:** Áo Ngũ Thân tay chẽn (five-panel robe with fitted sleeves), paired with classic white or black silk trousers.
+2. **Why it suits this destination:** As Vietnam's first national university, the Temple of Literature is a sacred sanctuary of Confucian scholarship. The upright collar and modest tailored cut honor the humility, decorum, and intellectual poise of ancient scholars.
+3. **Colors & Accessories:** Prioritize Indigo Blue (#1F2A44), imperial bronze gold, or earthy tones; complete with a black folded turban (khăn đóng) and a bamboo silk folding fan.
+4. **What to avoid:** Excessively short modern skirts, sheer transparent fabrics, or deep plunging necklines which violate sacred temple etiquette.
+5. **Alternative option:** For women seeking a softer folk silhouette, Áo Tứ Thân offers a poetic traditional alternative.
+
+{"trangPhuc":"ao-ngu-than-tay-chen","mau":["#1F2A44"],"phuKien":["khan-dong","quat-xep-lua"]}`,
+        outfitConfig: {
+          costumeId: "ao-ngu-than-tay-chen",
+          costumeName: "Áo Ngũ Thân tay chẽn",
+          colorHex: "#1F2A44",
+          colorName: "Xanh chàm mộc (Indigo Blue)",
+          accessories: ["khan-dong", "quat-xep-lua"],
+          trangPhuc: "ao-ngu-than-tay-chen",
+          mau: ["#1F2A44"],
+          phuKien: ["khan-dong", "quat-xep-lua"]
+        }
+      };
+    }
+
+    if (query.includes("hue") || query.includes("citadel") || query.includes("palace") || query.includes("tomb")) {
+      return {
+        text: `Welcome to the poetic imperial city of Hue! Walking along the stone courtyards of the **Hue Imperial Citadel (Đại Nội)**, the most breathtaking royal garment is **Áo Tấc (Nguyen Wide-Sleeved Ceremonial Robe)** or the imperial **Áo Nhật Bình** 🌸!
+
+1. **Main Recommendation:** Áo Tấc with wide flowing sleeves, or Áo Nhật Bình for female royal portraits.
+2. **Why it suits this destination:** The billowing wide sleeves and majestic ceremonial drape harmonize effortlessly with the mossy stone gates of Ngo Mon and ancient red lacquer corridors.
+3. **Colors & Accessories:** Royal Vermilion Red (#A4161A), imperial emerald green (#234E42), or amber orange; paired with silver torque necklaces (kiềng), handcrafted wooden clogs, and a silk folding fan.
+4. **What to avoid:** Inappropriate modern western casual wear or miniskirts that compromise the solemnity of the Nguyen imperial heritage.
+5. **Alternative option:** Áo Ngũ Thân tay chẽn if you plan an active full-day walking tour around multiple royal tombs.
+
+{"trangPhuc":"ao-tac","mau":["#A4161A"],"phuKien":["vong-kieng","quat-xep-lua"]}`,
+        outfitConfig: {
+          costumeId: "ao-tac",
+          costumeName: "Áo Tấc",
+          colorHex: "#A4161A",
+          colorName: "Đỏ son chu sa (Imperial Vermilion)",
+          accessories: ["vong-kieng", "quat-xep-lua"],
+          trangPhuc: "ao-tac",
+          mau: ["#A4161A"],
+          phuKien: ["vong-kieng", "quat-xep-lua"]
+        }
+      };
+    }
+
+    // Default English response
+    return {
+      text: `Hello and welcome to Vietnam! As your cultural attire stylist, I warmly recommend the iconic **Áo Ngũ Thân tay chẽn (Canonical Five-Panel Robe)** – the quintessential universal Vietnamese historical attire ✨.
+
+1. **Main Recommendation:** Traditional Áo Ngũ Thân with modest upright collar (lập lĩnh) and five buttoned panels over silk trousers.
+2. **Why it suits your journey:** The five panels symbolize the warmth of family protection and Confucian moral integrity (Benevolence, Propriety, Righteousness, Wisdom, and Faith). Its timeless silhouette flatters all body shapes effortlessly.
+3. **Colors & Accessories:** Classic Vermilion Red (#A4161A), Indigo Navy (#1F2A44), or Lotus Pink (#C95A72); styled with a silk folding fan, wooden clogs, or a delicate turban.
+4. **What to avoid:** Rolling up sleeve cuffs during formal temple visits or pairing with casual western sports sneakers.
+5. **Alternative option:** For festive outdoor lantern photos in Hoi An, wide-sleeved Áo Tấc or a graceful Áo Dài creates breathtaking photographic memories.
+
+{"trangPhuc":"ao-ngu-than-tay-chen","mau":["#A4161A"],"phuKien":["quat-xep-lua","vong-kieng"]}`,
+      outfitConfig: {
+        costumeId: "ao-ngu-than-tay-chen",
+        costumeName: "Áo Ngũ Thân tay chẽn",
+        colorHex: "#A4161A",
+        colorName: "Đỏ son chu sa (Imperial Vermilion)",
+        accessories: ["quat-xep-lua", "vong-kieng"],
+        trangPhuc: "ao-ngu-than-tay-chen",
+        mau: ["#A4161A"],
+        phuKien: ["quat-xep-lua", "vong-kieng"]
+      }
+    };
+  }
+
+  // Pattern match common destinations & occasions in Vietnamese
   if (query.includes("văn miếu") || query.includes("trường") || query.includes("tốt nghiệp") || query.includes("học")) {
     return {
       text: `Dạ chào bạn! Đi Văn Miếu - Quốc Tử Giám chụp ảnh kỷ yếu hay tham quan thì không gì thanh lịch và chuẩn mực hơn **Áo Ngũ thân tay chẽn (Áo dài ngũ thân triều Nguyễn)** ạ 🌿.
@@ -435,7 +508,9 @@ async function generateWithFallback(
 // API: AI Stylist Chat
 app.post("/api/stylist/chat", async (req, res) => {
   try {
-    const { messages, context } = req.body;
+    const { messages, context, lang } = req.body;
+    const isEn = lang === 'en';
+
     if (!messages || !Array.isArray(messages)) {
       return res.status(400).json({ error: "Invalid messages payload" });
     }
@@ -444,13 +519,23 @@ app.post("/api/stylist/chat", async (req, res) => {
 
     let contextPrompt = "";
     if (context) {
-      contextPrompt = `\n[NGỮ CẢNH NGƯỜI DÙNG]:\n` +
-        (context.location ? `- Địa điểm: ${context.location}\n` : "") +
-        (context.event ? `- Sự kiện / Dịp: ${context.event}\n` : "") +
-        (context.weather ? `- Thời tiết: ${context.weather}\n` : "") +
-        (context.gender ? `- Giới tính: ${context.gender}\n` : "") +
-        (context.budget ? `- Ngân sách: ${context.budget}\n` : "") +
-        (context.style ? `- Phong cách mong muốn: ${context.style}\n` : "");
+      if (isEn) {
+        contextPrompt = `\n[USER CONTEXT]:\n` +
+          (context.location ? `- Location: ${context.location}\n` : "") +
+          (context.event ? `- Event / Occasion: ${context.event}\n` : "") +
+          (context.weather ? `- Weather: ${context.weather}\n` : "") +
+          (context.gender ? `- Gender: ${context.gender}\n` : "") +
+          (context.budget ? `- Budget: ${context.budget}\n` : "") +
+          (context.style ? `- Desired Style: ${context.style}\n` : "");
+      } else {
+        contextPrompt = `\n[NGỮ CẢNH NGƯỜI DÙNG]:\n` +
+          (context.location ? `- Địa điểm: ${context.location}\n` : "") +
+          (context.event ? `- Sự kiện / Dịp: ${context.event}\n` : "") +
+          (context.weather ? `- Thời tiết: ${context.weather}\n` : "") +
+          (context.gender ? `- Giới tính: ${context.gender}\n` : "") +
+          (context.budget ? `- Ngân sách: ${context.budget}\n` : "") +
+          (context.style ? `- Phong cách mong muốn: ${context.style}\n` : "");
+      }
     }
 
     // Format conversation history for Gemini
@@ -467,15 +552,30 @@ app.post("/api/stylist/chat", async (req, res) => {
       }
     }
 
+    const effectiveSystemInstruction = isEn
+      ? `${SYSTEM_INSTRUCTION}
+
+[LANGUAGE REQUIREMENT - CRITICAL]:
+The user is viewing the platform in ENGLISH. You MUST formulate your entire response in elegant, friendly, cultured English (retain authentic Vietnamese costume names like Áo Nhật Bình, Áo Tấc, Áo Ngũ Thân with English explanation).
+Follow the 5-part structure:
+1. Main recommendation
+2. Why it suits this destination / event
+3. Colors & matching accessories
+4. What to avoid (cultural taboos)
+5. Alternative options
+And end with the EXACT valid single JSON line:
+{"trangPhuc":"id","mau":["#hex"],"phuKien":["id"]}`
+      : SYSTEM_INSTRUCTION;
+
     const response = await generateWithFallback(ai, {
       contents,
       config: {
-        systemInstruction: SYSTEM_INSTRUCTION,
+        systemInstruction: effectiveSystemInstruction,
         temperature: 0.7,
       },
     });
 
-    const replyText = response.text || "Dạ, Vân xin lỗi hiện chưa nhận được phản hồi. Bạn thử hỏi lại nhé!";
+    const replyText = response.text || (isEn ? "Hello, Van is momentarily unavailable. Please try asking again!" : "Dạ, Vân xin lỗi hiện chưa nhận được phản hồi. Bạn thử hỏi lại nhé!");
 
     // Extract embedded config/JSON from response (supports user format {"trangPhuc":"id","mau":["#hex"],"phuKien":["id"]} as well as code blocks)
     let outfitConfig: {
@@ -546,7 +646,8 @@ app.post("/api/stylist/chat", async (req, res) => {
       ? req.body.messages[req.body.messages.length - 1].content
       : "";
     
-    const fallbackAnswer = generateKnowledgeFallback(lastUserQuery, req.body?.context);
+    const isEn = req.body?.lang === 'en';
+    const fallbackAnswer = generateKnowledgeFallback(lastUserQuery, req.body?.context, isEn);
     return res.json({
       text: normalizeVN(fallbackAnswer.text),
       outfitConfig: fallbackAnswer.outfitConfig ? normalizeVN(fallbackAnswer.outfitConfig) : null,

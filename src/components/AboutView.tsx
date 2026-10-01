@@ -1,44 +1,63 @@
 import React from 'react';
 import { BookOpen, ShieldCheck, CheckCircle2, AlertTriangle, Layers, ExternalLink } from 'lucide-react';
 import { HeritageCorner, CloudMotif, LotusMotif, VanKySeal } from './TraditionalPattern';
+import { Language } from '../utils/i18n';
 
-export const AboutView: React.FC = () => {
+interface AboutViewProps {
+  language?: Language;
+}
+
+export const AboutView: React.FC<AboutViewProps> = ({ language = 'vi' }) => {
+  const isEn = language === 'en';
+
   const sources = [
     {
       title: "Khâm Định Đại Nam Hội Điển Sự Lệ",
-      author: "Nội các triều Nguyễn biên soạn (1851)",
-      category: "Điển chế triều đình",
-      desc: "Bộ chính thư ghi chép toàn bộ quy chế phẩm trật y phục, đồ trang sức của Hoàng đế, Hậu phi, Hoàng thân và bách quan triều Nguyễn."
+      author: isEn ? "Compiled by Nguyen Dynasty Cabinet (1851)" : "Nội các triều Nguyễn biên soạn (1851)",
+      category: isEn ? "Imperial Court Codes" : "Điển chế triều đình",
+      desc: isEn 
+        ? "Official imperial documentation recording all sumptuary laws, costume hierarchy, and royal jewelry protocols for Emperors, Empresses, nobility, and civil-military mandarins."
+        : "Bộ chính thư ghi chép toàn bộ quy chế phẩm trật y phục, đồ trang sức của Hoàng đế, Hậu phi, Hoàng thân và bách quan triều Nguyễn."
     },
     {
-      title: "Ngàn Năm Áo Mũ",
-      author: "Nhà nghiên cứu Trần Quang Đức (NXB Thế Giới, 2013)",
-      category: "Khảo cứu học thuật đương đại",
-      desc: "Công trình phục dựng hệ thống trang phục Việt Nam qua nghìn năm từ thời Lý, Trần, Lê sơ, Lê Trung Hưng tới triều Nguyễn dựa trên thư tịch và hiện vật."
+      title: "Ngàn Năm Áo Mũ (A Thousand Years of Caps & Robes)",
+      author: isEn ? "Researcher Tran Quang Duc (The Gioi Publishing, 2013)" : "Nhà nghiên cứu Trần Quang Đức (NXB Thế Giới, 2013)",
+      category: isEn ? "Contemporary Academic Research" : "Khảo cứu học thuật đương đại",
+      desc: isEn
+        ? "Monumental research reconstructing Vietnamese historical costumery across Ly, Tran, Early Le, Restored Le, and Nguyen dynasties based on primary texts and archaeological artifacts."
+        : "Công trình phục dựng hệ thống trang phục Việt Nam qua nghìn năm từ thời Lý, Trần, Lê sơ, Lê Trung Hưng tới triều Nguyễn dựa trên thư tịch và hiện vật."
     },
     {
-      title: "Đại Việt Sử Ký Toàn Thư",
-      author: "Ngô Sĩ Liên & Quốc sử quán các triều đại",
-      category: "Chính sử Đại Việt",
-      desc: "Ghi chép các chiếu chỉ định chế y phục qua các thời Lý, Trần, Lê sơ, quy định trang phục quân vương và thường dân."
+      title: "Đại Việt Sử Ký Toàn Thư (Complete Annals of Dai Viet)",
+      author: isEn ? "Ngo Si Lien & Dynastic Historiographers" : "Ngô Sĩ Liên & Quốc sử quán các triều đại",
+      category: isEn ? "Official Dynastic Annals" : "Chính sử Đại Việt",
+      desc: isEn
+        ? "Historical chronicles recording royal decrees on dress regulations, distinguishing court ceremonial robes from commoners' attire through successive dynasties."
+        : "Ghi chép các chiếu chỉ định chế y phục qua các thời Lý, Trần, Lê sơ, quy định trang phục quân vương và thường dân."
     },
     {
-      title: "Việt Nam Văn Hóa Sử Cương",
-      author: "Học giả Đào Duy Anh (1938)",
-      category: "Xã hội & Phong tục học",
-      desc: "Khái quát nếp sống, thẩm mỹ may mặc, phong tục vấn khăn, nhuộm răng và tập quán phục sức của người Việt xưa."
+      title: "Việt Nam Văn Hóa Sử Cương (Outline of Vietnamese Cultural History)",
+      author: isEn ? "Scholar Dao Duy Anh (1938)" : "Học giả Đào Duy Anh (1938)",
+      category: isEn ? "Sociology & Folklore" : "Xã hội & Phong tục học",
+      desc: isEn
+        ? "Overview of ancient Vietnamese lifestyle, aesthetic dress codes, turban wrapping traditions, and traditional folk adornment customs."
+        : "Khái quát nếp sống, thẩm mỹ may mặc, phong tục vấn khăn, nhuộm răng và tập quán phục sức của người Việt xưa."
     },
     {
-      title: "Lịch Triều Hiến Chương Loại Chí (Lễ nghi chí & Quan chức chí)",
-      author: "Bác học Phan Huy Chú (1821)",
-      category: "Bách khoa thư cổ điển",
-      desc: "Khảo cứu cặn kẽ về lễ phục tế tự, quan phục chầu triều, áo cổ tròn Viên Lĩnh và mũ Ô Sa qua các triều đại."
+      title: "Lịch Triều Hiến Chương Loại Chí (Categorized Annals of Dynastic Institutions)",
+      author: isEn ? "Scholar Phan Huy Chu (1821)" : "Bác học Phan Huy Chú (1821)",
+      category: isEn ? "Classical Encyclopedia" : "Bách khoa thư cổ điển",
+      desc: isEn
+        ? "Exhaustive studies on ancestral sacrificial attire, court audience regalia, Vien Linh round-collar robes, and O Sa winged caps across dynasties."
+        : "Khảo cứu cặn kẽ về lễ phục tế tự, quan phục chầu triều, áo cổ tròn Viên Lĩnh và mũ Ô Sa qua các triều đại."
     },
     {
-      title: "Tư Liệu Hiện Vật Bảo Tàng Cổ Vật Cung Đình Huế & Bảo Tàng Lịch Sử Quốc Gia",
-      author: "Cơ quan lưu trữ di sản quốc gia",
-      category: "Hiện vật & Khảo cổ học",
-      desc: "Các mẫu áo Nhật Bình gốc của Hoàng hậu Nam Phương, áo Tấc thời Nguyễn, tượng gỗ thế kỷ 17 chùa Bút Tháp và chùa Phật Tích."
+      title: isEn ? "Artifact Collections of Hue Royal Antiquities Museum & Vietnam National Museum of History" : "Tư Liệu Hiện Vật Bảo Tàng Cổ Vật Cung Đình Huế & Bảo Tàng Lịch Sử Quốc Gia",
+      author: isEn ? "National Heritage Preservation Authorities" : "Cơ quan lưu trữ di sản quốc gia",
+      category: isEn ? "Artifacts & Archaeology" : "Hiện vật & Khảo cổ học",
+      desc: isEn
+        ? "Original preserved Nhat Binh robes of Empress Nam Phuong, Nguyen dynasty Tac robes, and 17th-century wooden Buddhist statues at But Thap & Phat Tich pagodas."
+        : "Các mẫu áo Nhật Bình gốc của Hoàng hậu Nam Phương, áo Tấc thời Nguyễn, tượng gỗ thế kỷ 17 chùa Bút Tháp và chùa Phật Tích."
     }
   ];
 
@@ -48,15 +67,16 @@ export const AboutView: React.FC = () => {
       <div className="text-center max-w-3xl mx-auto">
         <div className="inline-flex items-center gap-2 text-xs uppercase tracking-widest text-[#B8862B] font-medium mb-1">
           <CloudMotif className="w-6 h-3 text-[#B8862B]" />
-          <span>Văn Hiến · Học Thuật · Tôn Trọng</span>
+          <span>{isEn ? 'Heritage · Scholarship · Respect' : 'Văn Hiến · Học Thuật · Tôn Trọng'}</span>
           <CloudMotif className="w-6 h-3 text-[#B8862B] rotate-180" />
         </div>
         <h1 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold text-[#1A1A1A] leading-tight">
-          Giới Thiệu & Nguồn Sử Liệu
+          {isEn ? 'About VẬN KỲ & Historical Archives' : 'Giới Thiệu & Nguồn Sử Liệu'}
         </h1>
         <p className="mt-3 text-sm sm:text-base text-[#4A4A4A] leading-relaxed">
-          Sứ mệnh của "VẬN KỲ" là đem tà áo cổ truyền bước ra từ trang sử sách và tủ kính bảo tàng, 
-          hòa nhịp cùng phong cách đương đại của người trẻ với sự tôn trọng tuyệt đối dành cho cội nguồn.
+          {isEn 
+            ? 'The mission of "VẬN KỲ" is to bring ancient Vietnamese attire out of dust-covered annals and museum glass cases into contemporary life, honoring authentic roots while enabling modern cultural experiences.'
+            : 'Sứ mệnh của "VẬN KỲ" là đem tà áo cổ truyền bước ra từ trang sử sách và tủ kính bảo tàng, hòa nhịp cùng phong cách đương đại của người trẻ với sự tôn trọng tuyệt đối dành cho cội nguồn.'}
         </p>
       </div>
 

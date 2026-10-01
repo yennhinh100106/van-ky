@@ -5,6 +5,7 @@ import {
 } from 'lucide-react';
 import { VanKySeal, LotusMotif } from './TraditionalPattern';
 import { normalizeVN } from '../utils/unicode';
+import { Language, UI_TRANSLATIONS } from '../utils/i18n';
 
 interface ChatMessage {
   id: string;
@@ -27,25 +28,43 @@ interface ChatStylistProps {
     colorName?: string;
     accessories?: string[];
   }) => void;
+  language?: Language;
 }
 
-export const ChatStylist: React.FC<ChatStylistProps> = ({ onApplyOutfitToStudio }) => {
+export const ChatStylist: React.FC<ChatStylistProps> = ({ 
+  onApplyOutfitToStudio, 
+  language = 'vi' 
+}) => {
+  const t = UI_TRANSLATIONS[language].chat;
+
   // Chat History
-  const [messages, setMessages] = useState<ChatMessage[]>([
+  const [messages, setMessages] = useState<ChatMessage[]>(() => [
     {
       id: 'welcome',
       role: 'assistant',
-      content: `Dạ, chào bạn! Mình là **Vân – Stylist Việt phục** của VẬN KỲ. 🌿
-
-Mình luôn ở đây để giúp bạn giải đáp mọi băn khoăn khi lựa chọn, may đo hoặc phối đồ truyền thống Việt Nam:
-- Mặc gì khi đi kỷ yếu ở Văn Miếu hay Đại Nội Huế?
-- Phối màu ngũ hành thế nào cho trang nghiêm mà vẫn trẻ trung?
-- Quy chuẩn tránh phạm húy, lệch lạc giai tầng khi kết hợp phụ kiện?
-
-Bạn có thể bấm vào các câu hỏi gợi ý bên dưới hoặc chọn ngữ cảnh cụ thể để Vân cố vấn nhé!`,
-      timestamp: 'Vừa xong'
+      content: language === 'en'
+        ? `Hello! I am **Van – Your Vietnamese Traditional Attire Stylist** at VẬN KỲ. 🌿\n\nI am here to assist you with choosing, styling, and understanding authentic Vietnamese heritage attire:\n- What to wear when visiting Temple of Literature (Hanoi) or the Imperial Citadel of Hue?\n- Five-element color matching philosophy for respectful elegance.\n- Royal court etiquette & motifs to avoid.\n\nFeel free to pick one of the quick questions below or customize your destination context!`
+        : `Dạ, chào bạn! Mình là **Vân – Stylist Việt phục** của VẬN KỲ. 🌿\n\nMình luôn ở đây để giúp bạn giải đáp mọi băn khoăn khi lựa chọn, may đo hoặc phối đồ truyền thống Việt Nam:\n- Mặc gì khi đi kỷ yếu ở Văn Miếu hay Đại Nội Huế?\n- Phối màu ngũ hành thế nào cho trang nghiêm mà vẫn trẻ trung?\n- Quy chuẩn tránh phạm húy, lệch lạc giai tầng khi kết hợp phụ kiện?\n\nBạn có thể bấm vào các câu hỏi gợi ý bên dưới hoặc chọn ngữ cảnh cụ thể để Vân cố vấn nhé!`,
+      timestamp: language === 'en' ? 'Just now' : 'Vừa xong'
     }
   ]);
+
+  // Update welcome message if language switches and only 1 message
+  useEffect(() => {
+    setMessages(prev => {
+      if (prev.length === 1 && prev[0].id === 'welcome') {
+        return [{
+          id: 'welcome',
+          role: 'assistant',
+          content: language === 'en'
+            ? `Hello! I am **Van – Your Vietnamese Traditional Attire Stylist** at VẬN KỲ. 🌿\n\nI am here to assist you with choosing, styling, and understanding authentic Vietnamese heritage attire:\n- What to wear when visiting Temple of Literature (Hanoi) or the Imperial Citadel of Hue?\n- Five-element color matching philosophy for respectful elegance.\n- Royal court etiquette & motifs to avoid.\n\nFeel free to pick one of the quick questions below or customize your destination context!`
+            : `Dạ, chào bạn! Mình là **Vân – Stylist Việt phục** của VẬN KỲ. 🌿\n\nMình luôn ở đây để giúp bạn giải đáp mọi băn khoăn khi lựa chọn, may đo hoặc phối đồ truyền thống Việt Nam:\n- Mặc gì khi đi kỷ yếu ở Văn Miếu hay Đại Nội Huế?\n- Phối màu ngũ hành thế nào cho trang nghiêm mà vẫn trẻ trung?\n- Quy chuẩn tránh phạm húy, lệch lạc giai tầng khi kết hợp phụ kiện?\n\nBạn có thể bấm vào các câu hỏi gợi ý bên dưới hoặc chọn ngữ cảnh cụ thể để Vân cố vấn nhé!`,
+          timestamp: language === 'en' ? 'Just now' : 'Vừa xong'
+        }];
+      }
+      return prev;
+    });
+  }, [language]);
 
   const [inputPrompt, setInputPrompt] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -71,7 +90,13 @@ Bạn có thể bấm vào các câu hỏi gợi ý bên dưới hoặc chọn n
   }, [messages, isLoading]);
 
   // Quick prompt chips
-  const quickChips = [
+  const quickChips = language === 'en' ? [
+    "What should I wear for photos at Temple of Literature?",
+    "Which traditional attire is best for pagodas & shrines?",
+    "Styling tips for graduation photos in Imperial Hue?",
+    "What attire suits an evening stroll in Hoi An ancient town?",
+    "Best traditional outfit for Lunar New Year in Hanoi?"
+  ] : [
     "Đi Văn Miếu chụp ảnh kỷ yếu nên mặc gì?",
     "Đi chùa nên mặc bộ nào?",
     "Lễ tốt nghiệp ở Huế phối gì?",
@@ -103,6 +128,7 @@ Bạn có thể bấm vào các câu hỏi gợi ý bên dưới hoặc chọn n
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           messages: updatedMessages.map(m => ({ role: m.role, content: m.content })),
+          lang: language,
           context: {
             location: contextLocation,
             event: contextEvent,
@@ -115,7 +141,7 @@ Bạn có thể bấm vào các câu hỏi gợi ý bên dưới hoặc chọn n
       });
 
       if (!res.ok) {
-        throw new Error('Máy chủ chưa phản hồi, vui lòng thử lại.');
+        throw new Error(language === 'en' ? 'Server did not respond, please try again.' : 'Máy chủ chưa phản hồi, vui lòng thử lại.');
       }
 
       const data = await res.json();
@@ -167,14 +193,16 @@ Bạn có thể bấm vào các câu hỏi gợi ý bên dưới hoặc chọn n
           <div>
             <div className="flex items-center gap-2">
               <h1 className="font-serif text-xl font-bold text-[#1A1A1A] leading-snug">
-                Vân – Stylist Việt Phục
+                {language === 'en' ? 'Van – Vietnamese Attire Stylist' : 'Vân – Stylist Việt Phục'}
               </h1>
               <span className="px-2 py-0.5 bg-[#A4161A]/10 text-[#A4161A] text-[10px] font-bold uppercase rounded">
-                Trí tuệ nhân tạo Gemini
+                {language === 'en' ? 'Gemini AI Advisor' : 'Trí tuệ nhân tạo Gemini'}
               </span>
             </div>
             <p className="text-xs text-[#555] mt-0.5">
-              Cố vấn trang phục cổ truyền chuẩn điển chế & cá nhân hóa sự kiện
+              {language === 'en' 
+                ? 'Heritage etiquette advisor & customized event outfit recommendations'
+                : 'Cố vấn trang phục cổ truyền chuẩn điển chế & cá nhân hóa sự kiện'}
             </p>
           </div>
         </div>
@@ -187,13 +215,17 @@ Bạn có thể bấm vào các câu hỏi gợi ý bên dưới hoặc chọn n
             }`}
           >
             <Calendar size={14} />
-            <span>{showContextPanel ? 'Thu gọn ngữ cảnh' : 'Chọn ngữ cảnh tư vấn'}</span>
+            <span>
+              {showContextPanel 
+                ? (language === 'en' ? 'Hide Context' : 'Thu gọn ngữ cảnh') 
+                : (language === 'en' ? 'Select Context' : 'Chọn ngữ cảnh tư vấn')}
+            </span>
           </button>
 
           <button
             onClick={handleResetChat}
             className="p-1.5 text-[#666] hover:text-[#A4161A] hover:bg-[#E8DEC8] rounded transition-colors cursor-pointer"
-            title="Làm mới cuộc trò chuyện"
+            title={language === 'en' ? 'Reset conversation' : 'Làm mới cuộc trò chuyện'}
           >
             <Trash2 size={16} />
           </button>
@@ -205,7 +237,7 @@ Bạn có thể bấm vào các câu hỏi gợi ý bên dưới hoặc chọn n
         <div className="bg-[#FAF6ED] border border-[#B8862B] p-4 sm:p-5 rounded mb-6 shadow-xs animate-in slide-in-from-top-2 duration-200">
           <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#A4161A] mb-3 pb-2 border-b border-[#E8DEC8]">
             <Sparkles size={14} className="text-[#D4A347]" />
-            <span>Thiết Lập Ngữ Cảnh Tư Vấn Của Bạn</span>
+            <span>{language === 'en' ? 'Customize Your Styling Context' : 'Thiết Lập Ngữ Cảnh Tư Vấn Của Bạn'}</span>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 text-xs">
@@ -213,7 +245,7 @@ Bạn có thể bấm vào các câu hỏi gợi ý bên dưới hoặc chọn n
             <div>
               <label className="flex items-center gap-1 text-[#666] font-medium mb-1">
                 <MapPin size={13} className="text-[#A4161A]" />
-                <span>Địa điểm đến:</span>
+                <span>{language === 'en' ? 'Destination:' : 'Địa điểm đến:'}</span>
               </label>
               <select
                 value={contextLocation}
@@ -232,18 +264,18 @@ Bạn có thể bấm vào các câu hỏi gợi ý bên dưới hoặc chọn n
             <div>
               <label className="flex items-center gap-1 text-[#666] font-medium mb-1">
                 <Calendar size={13} className="text-[#A4161A]" />
-                <span>Sự kiện / Mục đích:</span>
+                <span>{language === 'en' ? 'Event / Purpose:' : 'Sự kiện / Mục đích:'}</span>
               </label>
               <select
                 value={contextEvent}
                 onChange={(e) => setContextEvent(e.target.value)}
                 className="w-full bg-[#F6EFE3] border border-[#CFC3B0] rounded p-2 text-[#1A1A1A] focus:outline-none focus:border-[#A4161A]"
               >
-                <option value="Chụp ảnh kỷ yếu tốt nghiệp">Chụp ảnh kỷ yếu tốt nghiệp học sinh/sinh viên</option>
-                <option value="Lễ cưới hỏi, đón dâu truyền thống">Lễ cưới hỏi, đính hôn, rước dâu</option>
-                <option value="Đi lễ chùa, cầu an đầu năm">Đi lễ chùa, tế lễ gia tiên đầu xuân</option>
-                <option value="Dạo phố Tết, du xuân chụp ảnh">Dạo phố ngày Tết, du xuân cùng bạn bè</option>
-                <option value="Hội nghị, giao lưu văn hóa quốc tế">Hội thảo, giao lưu văn hóa quốc tế</option>
+                <option value="Chụp ảnh kỷ yếu tốt nghiệp">{language === 'en' ? 'Graduation photo shoot' : 'Chụp ảnh kỷ yếu tốt nghiệp học sinh/sinh viên'}</option>
+                <option value="Lễ cưới hỏi, đón dâu truyền thống">{language === 'en' ? 'Traditional wedding ceremony' : 'Lễ cưới hỏi, đính hôn, rước dâu'}</option>
+                <option value="Đi lễ chùa, cầu an đầu năm">{language === 'en' ? 'Pagoda visit / spiritual blessings' : 'Đi lễ chùa, tế lễ gia tiên đầu xuân'}</option>
+                <option value="Dạo phố Tết, du xuân chụp ảnh">{language === 'en' ? 'Spring festival / street photos' : 'Dạo phố ngày Tết, du xuân cùng bạn bè'}</option>
+                <option value="Hội nghị, giao lưu văn hóa quốc tế">{language === 'en' ? 'International cultural exchange' : 'Hội thảo, giao lưu văn hóa quốc tế'}</option>
               </select>
             </div>
 
@@ -251,16 +283,16 @@ Bạn có thể bấm vào các câu hỏi gợi ý bên dưới hoặc chọn n
             <div>
               <label className="flex items-center gap-1 text-[#666] font-medium mb-1">
                 <CloudSun size={13} className="text-[#A4161A]" />
-                <span>Thời tiết:</span>
+                <span>{language === 'en' ? 'Weather:' : 'Thời tiết:'}</span>
               </label>
               <select
                 value={contextWeather}
                 onChange={(e) => setContextWeather(e.target.value)}
                 className="w-full bg-[#F6EFE3] border border-[#CFC3B0] rounded p-2 text-[#1A1A1A] focus:outline-none focus:border-[#A4161A]"
               >
-                <option value="Mát mẻ mùa thu đông">Mát mẻ mùa thu đông (20 - 25°C)</option>
-                <option value="Nắng hè oi bức">Nắng hè oi bức (trên 30°C)</option>
-                <option value="Se lạnh đầu xuân">Se lạnh đầu xuân có mưa phùn</option>
+                <option value="Mát mẻ mùa thu đông">{language === 'en' ? 'Cool autumn / winter (20 - 25°C)' : 'Mát mẻ mùa thu đông (20 - 25°C)'}</option>
+                <option value="Nắng hè oi bức">{language === 'en' ? 'Hot summer (over 30°C)' : 'Nắng hè oi bức (trên 30°C)'}</option>
+                <option value="Se lạnh đầu xuân">{language === 'en' ? 'Crisp early spring with light mist' : 'Se lạnh đầu xuân có mưa phùn'}</option>
               </select>
             </div>
 
@@ -268,17 +300,17 @@ Bạn có thể bấm vào các câu hỏi gợi ý bên dưới hoặc chọn n
             <div>
               <label className="flex items-center gap-1 text-[#666] font-medium mb-1">
                 <User size={13} className="text-[#A4161A]" />
-                <span>Người mặc:</span>
+                <span>{language === 'en' ? 'Wearer:' : 'Người mặc:'}</span>
               </label>
               <select
                 value={contextGender}
                 onChange={(e) => setContextGender(e.target.value)}
                 className="w-full bg-[#F6EFE3] border border-[#CFC3B0] rounded p-2 text-[#1A1A1A] focus:outline-none focus:border-[#A4161A]"
               >
-                <option value="Nữ giới">Nữ giới</option>
-                <option value="Nam giới">Nam giới</option>
-                <option value="Cặp đôi (Nam & Nữ)">Cặp đôi (Nam & Nữ tông xuyệt tông)</option>
-                <option value="Nhóm bạn bè kỷ yếu">Nhóm bạn bè kỷ yếu tập thể</option>
+                <option value="Nữ giới">{language === 'en' ? 'Female' : 'Nữ giới'}</option>
+                <option value="Nam giới">{language === 'en' ? 'Male' : 'Nam giới'}</option>
+                <option value="Cặp đôi (Nam & Nữ)">{language === 'en' ? 'Couple matching' : 'Cặp đôi (Nam & Nữ tông xuyệt tông)'}</option>
+                <option value="Nhóm bạn bè kỷ yếu">{language === 'en' ? 'Group of friends' : 'Nhóm bạn bè kỷ yếu tập thể'}</option>
               </select>
             </div>
 
@@ -286,16 +318,16 @@ Bạn có thể bấm vào các câu hỏi gợi ý bên dưới hoặc chọn n
             <div>
               <label className="flex items-center gap-1 text-[#666] font-medium mb-1">
                 <DollarSign size={13} className="text-[#A4161A]" />
-                <span>Ngân sách dự tính:</span>
+                <span>{language === 'en' ? 'Budget range:' : 'Ngân sách dự tính:'}</span>
               </label>
               <select
                 value={contextBudget}
                 onChange={(e) => setContextBudget(e.target.value)}
                 className="w-full bg-[#F6EFE3] border border-[#CFC3B0] rounded p-2 text-[#1A1A1A] focus:outline-none focus:border-[#A4161A]"
               >
-                <option value="Học sinh - Sinh viên (thuê đồ tiết kiệm)">Học sinh - Sinh viên (thuê đồ tiết kiệm dưới 300k)</option>
-                <option value="Tầm trung phổ thông (500k - 1tr)">Tầm trung phổ thông (500k - 1 triệu)</option>
-                <option value="May đo cao cấp lụa tơ tằm thượng phẩm">May đo cao cấp lụa tơ tằm thượng phẩm</option>
+                <option value="Học sinh - Sinh viên (thuê đồ tiết kiệm)">{language === 'en' ? 'Budget friendly / Student' : 'Học sinh - Sinh viên (thuê đồ tiết kiệm dưới 300k)'}</option>
+                <option value="Tầm trung phổ thông (500k - 1tr)">{language === 'en' ? 'Mid-range standard' : 'Tầm trung phổ thông (500k - 1 triệu)'}</option>
+                <option value="May đo cao cấp lụa tơ tằm thượng phẩm">{language === 'en' ? 'Premium hand-tailored silk' : 'May đo cao cấp lụa tơ tằm thượng phẩm'}</option>
               </select>
             </div>
 
@@ -303,15 +335,15 @@ Bạn có thể bấm vào các câu hỏi gợi ý bên dưới hoặc chọn n
             <div>
               <label className="flex items-center gap-1 text-[#666] font-medium mb-1">
                 <Shirt size={13} className="text-[#A4161A]" />
-                <span>Phong cách ưu tiên:</span>
+                <span>{language === 'en' ? 'Style preference:' : 'Phong cách ưu tiên:'}</span>
               </label>
               <select
                 value={contextStyle}
                 onChange={(e) => setContextStyle(e.target.value)}
                 className="w-full bg-[#F6EFE3] border border-[#CFC3B0] rounded p-2 text-[#1A1A1A] focus:outline-none focus:border-[#A4161A]"
               >
-                <option value="Thuần cổ phục chuẩn chỉ điển chế">Thuần cổ phục chuẩn chỉ điển chế</option>
-                <option value="Cách tân hiện đại trẻ trung">Cách tân hiện đại trẻ trung tiện lợi</option>
+                <option value="Thuần cổ phục chuẩn chỉ điển chế">{language === 'en' ? 'Strict historical authenticity' : 'Thuần cổ phục chuẩn chỉ điển chế'}</option>
+                <option value="Cách tân hiện đại trẻ trung">{language === 'en' ? 'Modernized & comfortable' : 'Cách tân hiện đại trẻ trung tiện lợi'}</option>
               </select>
             </div>
           </div>
@@ -320,7 +352,9 @@ Bạn có thể bấm vào các câu hỏi gợi ý bên dưới hoặc chọn n
 
       {/* Suggested Quick Question Chips */}
       <div className="mb-4">
-        <span className="text-xs text-[#777] block mb-2 font-medium">Gợi ý câu hỏi nhanh:</span>
+        <span className="text-xs text-[#777] block mb-2 font-medium">
+          {language === 'en' ? 'Suggested Quick Inquiries:' : 'Gợi ý câu hỏi nhanh:'}
+        </span>
         <div className="flex flex-wrap gap-2">
           {quickChips.map((chip, idx) => (
             <button
@@ -373,7 +407,7 @@ Bạn có thể bấm vào các câu hỏi gợi ý bên dưới hoặc chọn n
                   <div className="mt-3 p-3.5 bg-[#FAF6ED] border-2 border-[#B8862B] rounded w-full flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs animate-in zoom-in-95">
                     <div>
                       <div className="text-[10px] uppercase font-bold text-[#A4161A] tracking-wider">
-                        Gợi ý phối đồ từ Vân:
+                        {language === 'en' ? "Van's Recommended Outfit:" : 'Gợi ý phối đồ từ Vân:'}
                       </div>
                       <div className="font-serif font-bold text-sm text-[#1A1A1A]">
                         {msg.outfitConfig.costumeName || msg.outfitConfig.costumeId}
@@ -408,7 +442,7 @@ Bạn có thể bấm vào các câu hỏi gợi ý bên dưới hoặc chọn n
                       className="px-3.5 py-2 bg-[#A4161A] hover:bg-[#850D11] text-white text-xs font-semibold rounded uppercase tracking-wider transition-colors flex items-center justify-center gap-1.5 cursor-pointer shrink-0 shadow-xs"
                     >
                       <Sparkles size={14} className="text-[#D4A347]" />
-                      <span>Thử phối bộ này</span>
+                      <span>{language === 'en' ? 'Try this in Studio' : 'Thử phối bộ này'}</span>
                       <ArrowRight size={13} />
                     </button>
                   </div>
@@ -430,7 +464,7 @@ Bạn có thể bấm vào các câu hỏi gợi ý bên dưới hoặc chọn n
             </div>
             <div className="bg-[#F6EFE3] border border-[#E0D5C3] p-4 rounded text-xs text-[#666] flex items-center gap-2">
               <RefreshCw size={15} className="animate-spin text-[#A4161A]" />
-              <span>Vân đang tra cứu sử liệu và soạn bài tư vấn cho bạn...</span>
+              <span>{language === 'en' ? 'Van is reviewing historical archives and composing your styling advice...' : 'Vân đang tra cứu sử liệu và soạn bài tư vấn cho bạn...'}</span>
             </div>
           </div>
         )}
@@ -446,7 +480,7 @@ Bạn có thể bấm vào các câu hỏi gợi ý bên dưới hoặc chọn n
               onClick={() => handleSendMessage()}
               className="text-xs font-semibold text-red-900 underline ml-3 cursor-pointer"
             >
-              Thử lại
+              {language === 'en' ? 'Retry' : 'Thử lại'}
             </button>
           </div>
         )}
@@ -467,7 +501,7 @@ Bạn có thể bấm vào các câu hỏi gợi ý bên dưới hoặc chọn n
             type="text"
             value={inputPrompt}
             onChange={(e) => setInputPrompt(e.target.value)}
-            placeholder="Hỏi Vân về cách chọn cổ phục, dịp mặc, phối màu, phụ kiện..."
+            placeholder={language === 'en' ? 'Ask Van about choosing attire, etiquette, colors, occasions...' : 'Hỏi Vân về cách chọn cổ phục, dịp mặc, phối màu, phụ kiện...'}
             className="w-full bg-[#FAF6ED] border border-[#D8CEBE] rounded px-4 py-3 text-xs sm:text-sm text-[#1A1A1A] placeholder-[#888] focus:outline-none focus:border-[#A4161A] pr-10 shadow-xs"
             disabled={isLoading}
           />
@@ -477,7 +511,7 @@ Bạn có thể bấm vào các câu hỏi gợi ý bên dưới hoặc chọn n
           disabled={!inputPrompt.trim() || isLoading}
           className="px-5 py-3 bg-[#A4161A] hover:bg-[#850D11] text-white text-xs font-semibold uppercase tracking-wider rounded transition-colors flex items-center gap-2 cursor-pointer disabled:opacity-50 shadow-xs"
         >
-          <span>Gửi</span>
+          <span>{language === 'en' ? 'Send' : 'Gửi'}</span>
           <Send size={14} />
         </button>
       </form>

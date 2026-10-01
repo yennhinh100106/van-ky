@@ -2,7 +2,8 @@ import React, { useState, useRef, useEffect } from 'react';
 import { 
   Palette, Sparkles, Layers, ShieldAlert, CheckCircle2, Download, 
   Share2, Columns, RefreshCw, Upload, Image as ImageIcon, Info, ChevronRight, Eye,
-  Heart, Bookmark, Trash2, X, Copy, Check, ExternalLink, QrCode, Smartphone, Link as LinkIcon, Send
+  Heart, Bookmark, Trash2, X, Copy, Check, ExternalLink, QrCode, Smartphone, Link as LinkIcon, Send,
+  Package, ShieldCheck, Compass, Users, Award
 } from 'lucide-react';
 import lookbookData from '../data/lookbook.json';
 import { ACCESSORIES_DATA, TRADITIONAL_COLORS, PRESET_TONES } from '../data/accessories';
@@ -10,14 +11,28 @@ import { Costume, CulturalWarning, SavedOutfit, HarmonyScoreResult } from '../ty
 import { StudioDoll } from './StudioDoll';
 import { HeritageCorner } from './TraditionalPattern';
 import { normalizeVN } from '../utils/unicode';
+import { COSTUME_PRICING, formatVND } from '../data/partners';
+import { Language, Currency, formatPrice, UI_TRANSLATIONS, DESTINATIONS_DATA } from '../utils/i18n';
+import { isCostumeCanonVerified } from '../utils/partnerStoreSettings';
 
 interface StudioViewProps {
   initialCostumeId?: string;
   onNavigateToCostume?: (costumeId: string) => void;
+  onOpenRentalModal?: (costume: Costume, colorName?: string, colorHex?: string, accessories?: string[]) => void;
+  onNavigateToGroups?: () => void;
+  language?: Language;
+  currency?: Currency;
 }
 
-export const StudioView: React.FC<StudioViewProps> = ({ initialCostumeId = 'nhat-binh' }) => {
+export const StudioView: React.FC<StudioViewProps> = ({ 
+  initialCostumeId = 'nhat-binh',
+  onOpenRentalModal,
+  onNavigateToGroups,
+  language = 'vi',
+  currency = 'VND'
+}) => {
   const costumes = React.useMemo(() => normalizeVN(lookbookData as Costume[]), []);
+  const t = UI_TRANSLATIONS[language].studio;
 
   // Parse URL search parameters on initialization for unique shared links
   const urlParams = React.useMemo(() => {
@@ -763,6 +778,14 @@ export const StudioView: React.FC<StudioViewProps> = ({ initialCostumeId = 'nhat
           <h1 className="font-serif text-2xl sm:text-3xl font-bold text-[#1A1A1A] leading-snug">
             Tự Do Sáng Tạo Phối Đồ
           </h1>
+          {isCostumeCanonVerified(currentCostume.id) && (
+            <div className="mt-1">
+              <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 bg-[#D4A347] text-[#1A1A1A] rounded-xs shadow-xs border border-[#B8862B]">
+                <Award size={12} />
+                <span>Tiệm cung cấp đã kiểm định điển chế</span>
+              </span>
+            </div>
+          )}
         </div>
 
         {/* Top Actions: Compare, Favorite, My Collection & Export */}
@@ -783,7 +806,7 @@ export const StudioView: React.FC<StudioViewProps> = ({ initialCostumeId = 'nhat
                 isCurrentFavorited ? 'fill-[#A4161A] text-[#A4161A] scale-110' : 'text-[#A4161A]'
               }`}
             />
-            <span>{isCurrentFavorited ? 'Đã yêu thích' : 'Yêu thích'}</span>
+            <span>{isCurrentFavorited ? t.favorited : t.favorite}</span>
           </button>
 
           {/* My Collection Quick Access Button */}
@@ -793,7 +816,7 @@ export const StudioView: React.FC<StudioViewProps> = ({ initialCostumeId = 'nhat
               className="px-3.5 py-2 bg-[#FAF6ED] hover:bg-[#E8DEC8] border border-[#D8CEBE] text-xs font-semibold uppercase tracking-wider rounded text-[#1A1A1A] transition-colors flex items-center gap-1.5 cursor-pointer"
             >
               <Bookmark size={15} className="text-[#B8862B]" />
-              <span>Bộ sưu tập ({myCollection.length})</span>
+              <span>{t.myCollection} ({myCollection.length})</span>
             </button>
           )}
 
@@ -802,7 +825,7 @@ export const StudioView: React.FC<StudioViewProps> = ({ initialCostumeId = 'nhat
             className="px-3.5 py-2 bg-[#FAF6ED] hover:bg-[#E8DEC8] border border-[#D8CEBE] text-xs font-semibold uppercase tracking-wider rounded text-[#1A1A1A] transition-colors flex items-center gap-1.5 cursor-pointer"
           >
             <Columns size={15} />
-            <span>Lưu so sánh ({savedOutfits.length}/3)</span>
+            <span>{language === 'en' ? 'Save for compare' : 'Lưu so sánh'} ({savedOutfits.length}/3)</span>
           </button>
 
           {savedOutfits.length > 0 && (
@@ -811,9 +834,37 @@ export const StudioView: React.FC<StudioViewProps> = ({ initialCostumeId = 'nhat
               className="px-3.5 py-2 bg-[#1F2A44] hover:bg-[#121A2D] text-white text-xs font-semibold uppercase tracking-wider rounded transition-colors flex items-center gap-1.5 cursor-pointer"
             >
               <Eye size={15} />
-              <span>Xem so sánh</span>
+              <span>{language === 'en' ? 'Compare' : 'Xem so sánh'}</span>
             </button>
           )}
+
+          {/* ĐẶT THUÊ BỘ NÀY BUTTON (REQUIREMENT 2) */}
+          <button
+            onClick={() => {
+              if (onOpenRentalModal) {
+                onOpenRentalModal(currentCostume, currentColorName, currentColorHex, selectedAccessories);
+              }
+            }}
+            title="Đặt thuê bộ trang phục này với cấu hình màu & phụ kiện đã chọn"
+            className="px-4 py-2 bg-[#A4161A] hover:bg-[#850D11] text-white text-xs font-bold uppercase tracking-wider rounded transition-colors flex items-center gap-1.5 cursor-pointer shadow-md"
+          >
+            <Package size={15} className="text-[#D4A347]" />
+            <span>{t.rentThisLook}</span>
+            {COSTUME_PRICING[currentCostume.id] && (
+              <span className="hidden xl:inline text-[11px] font-normal text-[#FAF6ED]/80">
+                ({formatPrice(COSTUME_PRICING[currentCostume.id].pricePerDay, currency)}/{language === 'en' ? 'day' : 'ngày'})
+              </span>
+            )}
+          </button>
+
+          <button
+            onClick={() => onNavigateToGroups?.()}
+            title="Tạo đơn nhóm cho lớp, kỷ yếu, câu lạc bộ"
+            className="px-3.5 py-2 bg-[#1F2A44] hover:bg-[#121A2D] text-white text-xs font-semibold uppercase tracking-wider rounded transition-colors flex items-center gap-1.5 cursor-pointer shadow-xs"
+          >
+            <Users size={15} className="text-[#D4A347]" />
+            <span>{language === 'en' ? 'Group Order' : 'Tạo đơn nhóm'}</span>
+          </button>
 
           <button
             onClick={() => handleShareOutfit(false)}
@@ -821,7 +872,7 @@ export const StudioView: React.FC<StudioViewProps> = ({ initialCostumeId = 'nhat
             className="px-3.5 py-2 bg-[#FAF6ED] hover:bg-[#E8DEC8] border border-[#B8862B] text-xs font-semibold uppercase tracking-wider rounded text-[#A4161A] transition-colors flex items-center gap-1.5 cursor-pointer shadow-xs"
           >
             <Share2 size={15} className="text-[#A4161A]" />
-            <span>Chia sẻ bộ phối</span>
+            <span>{t.shareOutfit}</span>
           </button>
 
           <button
@@ -829,8 +880,44 @@ export const StudioView: React.FC<StudioViewProps> = ({ initialCostumeId = 'nhat
             className="px-4 py-2 bg-[#A4161A] hover:bg-[#850D11] text-white text-xs font-semibold uppercase tracking-wider rounded transition-colors flex items-center gap-1.5 cursor-pointer shadow-xs"
           >
             <Download size={15} className="text-[#D4A347]" />
-            <span>Tạo lookbook cá nhân</span>
+            <span>{t.exportPoster}</span>
           </button>
+        </div>
+      </div>
+
+      {/* REQUIREMENT 3: DESTINATION QUICK STRIP IN STUDIO */}
+      <div className="bg-[#FAF6ED] border border-[#D8CEBE] px-4 py-2.5 rounded mb-6 flex flex-wrap items-center justify-between gap-3 text-xs shadow-2xs">
+        <div className="flex items-center gap-2">
+          <Compass size={15} className="text-[#A4161A]" />
+          <span className="font-bold text-[#1A1A1A]">
+            {language === 'en' ? 'Filter by Destination & Scene:' : 'Khám phá theo Điểm Đến Văn Hóa:'}
+          </span>
+        </div>
+        <div className="flex flex-wrap items-center gap-1.5">
+          {DESTINATIONS_DATA.map((dest) => (
+            <button
+              key={dest.id}
+              onClick={() => {
+                if (dest.id === 'hue') setBackgroundScene('hue');
+                else if (dest.id === 'ha-noi' || dest.id === 'van-mieu') setBackgroundScene('thanglong');
+                else if (dest.id === 'hoi-an') setBackgroundScene('hoian');
+                else if (dest.id === 'hcm') setBackgroundScene('studio');
+
+                if (!dest.suggestedCostumeIds.includes(selectedCostumeId)) {
+                  setSelectedCostumeId(dest.suggestedCostumeIds[0]);
+                }
+              }}
+              className={`px-2.5 py-1 rounded text-[11px] font-semibold transition-all cursor-pointer border ${
+                (backgroundScene === 'hue' && dest.id === 'hue') ||
+                (backgroundScene === 'thanglong' && (dest.id === 'ha-noi' || dest.id === 'van-mieu')) ||
+                (backgroundScene === 'hoian' && dest.id === 'hoi-an')
+                  ? 'bg-[#A4161A] text-white border-[#A4161A] shadow-2xs'
+                  : 'bg-[#F6EFE3] hover:bg-[#EAE0D0] text-[#1A1A1A] border-[#D8CEBE]'
+              }`}
+            >
+              {language === 'en' ? dest.nameEn.split('(')[0].trim() : dest.nameVi.split('(')[0].trim()}
+            </button>
+          ))}
         </div>
       </div>
 
@@ -914,27 +1001,41 @@ export const StudioView: React.FC<StudioViewProps> = ({ initialCostumeId = 'nhat
               </div>
             </div>
 
-            {/* Custom Avatar Upload Affordance */}
-            <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between text-xs">
-              <label className="bg-[#FAF6ED]/90 hover:bg-[#FAF6ED] backdrop-blur-xs border border-[#D8CEBE] px-3 py-1.5 rounded cursor-pointer text-[#1A1A1A] font-medium flex items-center gap-1.5 shadow-xs transition-colors">
-                <Upload size={14} className="text-[#A4161A]" />
-                <span>{userAvatar ? 'Đổi ảnh thử mặt' : 'Tải ảnh mặt để thử'}</span>
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleAvatarUpload}
-                  className="hidden"
-                />
-              </label>
+            {/* Custom Avatar Upload Affordance & Quick Rental Button */}
+            <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between text-xs gap-2">
+              <div className="flex items-center gap-1.5">
+                <label className="bg-[#FAF6ED]/90 hover:bg-[#FAF6ED] backdrop-blur-xs border border-[#D8CEBE] px-3 py-1.5 rounded cursor-pointer text-[#1A1A1A] font-medium flex items-center gap-1.5 shadow-xs transition-colors">
+                  <Upload size={14} className="text-[#A4161A]" />
+                  <span>{userAvatar ? 'Đổi mặt' : 'Thử mặt'}</span>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleAvatarUpload}
+                    className="hidden"
+                  />
+                </label>
 
-              {userAvatar && (
-                <button
-                  onClick={() => setUserAvatar(undefined)}
-                  className="bg-red-50 text-[#A4161A] px-2 py-1 rounded text-[11px] border border-red-200"
-                >
-                  Gỡ ảnh
-                </button>
-              )}
+                {userAvatar && (
+                  <button
+                    onClick={() => setUserAvatar(undefined)}
+                    className="bg-red-50 text-[#A4161A] px-2 py-1 rounded text-[11px] border border-red-200"
+                  >
+                    Gỡ
+                  </button>
+                )}
+              </div>
+
+              <button
+                onClick={() => {
+                  if (onOpenRentalModal) {
+                    onOpenRentalModal(currentCostume, currentColorName, currentColorHex, selectedAccessories);
+                  }
+                }}
+                className="bg-[#A4161A]/95 hover:bg-[#850D11] text-white px-3 py-1.5 rounded text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 shadow-md cursor-pointer transition-colors backdrop-blur-xs"
+              >
+                <Package size={14} className="text-[#D4A347]" />
+                <span>Thuê phối này</span>
+              </button>
             </div>
           </div>
 
@@ -1028,8 +1129,16 @@ export const StudioView: React.FC<StudioViewProps> = ({ initialCostumeId = 'nhat
 
           {/* Short Information Card for the Current Costume */}
           <div className="bg-[#FAF6ED] border border-[#D8CEBE] p-4 rounded text-xs space-y-2">
-            <div className="font-serif font-bold text-sm text-[#1A1A1A] flex items-center justify-between">
-              <span>{currentCostume.name} ({currentCostume.romanized})</span>
+            <div className="font-serif font-bold text-sm text-[#1A1A1A] flex items-center justify-between flex-wrap gap-2">
+              <span className="flex items-center gap-1.5 flex-wrap">
+                <span>{currentCostume.name} ({currentCostume.romanized})</span>
+                {isCostumeCanonVerified(currentCostume.id) && (
+                  <span className="text-[10px] font-bold px-1.5 py-0.5 bg-[#D4A347] text-[#1A1A1A] rounded-xs shadow-xs border border-[#B8862B] flex items-center gap-0.5">
+                    <Award size={11} />
+                    <span>Đã kiểm định</span>
+                  </span>
+                )}
+              </span>
               <span className="text-[11px] text-[#A4161A] font-sans font-medium">{currentCostume.period}</span>
             </div>
             <p className="text-[#4A4A4A] leading-relaxed">
@@ -1053,7 +1162,7 @@ export const StudioView: React.FC<StudioViewProps> = ({ initialCostumeId = 'nhat
               }`}
             >
               <Layers size={14} />
-              <span>a) Chọn Trang Phục</span>
+              <span>{language === 'en' ? 'a) Attire' : 'a) Chọn Trang Phục'}</span>
             </button>
             <button
               onClick={() => setActiveTab('color')}
@@ -1062,7 +1171,7 @@ export const StudioView: React.FC<StudioViewProps> = ({ initialCostumeId = 'nhat
               }`}
             >
               <Palette size={14} />
-              <span>b) Đổi Tone Màu</span>
+              <span>{language === 'en' ? 'b) Colors' : 'b) Đổi Tone Màu'}</span>
             </button>
             <button
               onClick={() => setActiveTab('accessories')}
@@ -1071,7 +1180,7 @@ export const StudioView: React.FC<StudioViewProps> = ({ initialCostumeId = 'nhat
               }`}
             >
               <Sparkles size={14} />
-              <span>c) Phụ Kiện ({selectedAccessories.length})</span>
+              <span>{language === 'en' ? `c) Accessories (${selectedAccessories.length})` : `c) Phụ Kiện (${selectedAccessories.length})`}</span>
             </button>
             <button
               onClick={() => setActiveTab('check')}
@@ -1080,7 +1189,7 @@ export const StudioView: React.FC<StudioViewProps> = ({ initialCostumeId = 'nhat
               }`}
             >
               <ShieldAlert size={14} />
-              <span>d) Kiểm Tra & Cảnh Báo</span>
+              <span>{language === 'en' ? 'd) Protocol Check' : 'd) Kiểm Tra & Cảnh Báo'}</span>
             </button>
           </div>
 
